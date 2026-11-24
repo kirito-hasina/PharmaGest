@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Page introuvable{% endblock %}
+{% block content %}
+<div class="empty-state error-page">
+  <i class="bi bi-search" aria-hidden="true"></i>
+  <h1>Page introuvable</h1>
+  <p>Cette page n’existe pas ou l’élément demandé a été supprimé.</p>
+  <a class="btn btn-primary" href="{% url 'rapports:dashboard' %}">Retour à l’accueil</a>
+</div>
+{% endblock %}

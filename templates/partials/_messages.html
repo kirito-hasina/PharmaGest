@@ -1,0 +1,10 @@
+{% if messages %}
+<div class="flash-stack" role="status" aria-live="polite">
+  {% for message in messages %}
+  <div class="flash flash-{{ message.level_tag }}">
+    <i class="bi {% if message.level_tag == 'success' %}bi-check-circle-fill{% elif message.level_tag == 'danger' %}bi-exclamation-octagon-fill{% elif message.level_tag == 'warning' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %}" aria-hidden="true"></i>
+    <div>{{ message }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}

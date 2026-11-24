@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Lots{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Tous les lots</h1><p class="lede">{{ page_obj.paginator.count }} lot{{ page_obj.paginator.count|pluralize }} enregistré{{ page_obj.paginator.count|pluralize }}.</p></div></div>
+{% if lots %}{% include "stock/_table_lots.html" %}{% include "partials/_pagination.html" %}
+{% else %}<div class="empty-state"><i class="bi bi-box-seam" aria-hidden="true"></i><h2>Aucun lot</h2><p>Les lots apparaissent après la première réception d’une commande.</p></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Péremptions{% endblock %}
+{% block content %}
+{% include "rapports/_entete.html" with titre="Produits proches de la péremption" kind="peremption" %}
+{% if lots %}{% include "stock/_table_lots.html" %}
+{% else %}<div class="empty-state"><i class="bi bi-check-circle" aria-hidden="true"></i><h2>Rien à signaler</h2><p>Aucun lot périmé ou proche de la péremption.</p></div>{% endif %}
+{% endblock %}

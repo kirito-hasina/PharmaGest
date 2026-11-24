@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Utilisateurs{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Utilisateurs</h1><p class="lede">Comptes du personnel, rôles et activation.</p></div>
+  <div class="page-head-actions"><a class="btn btn-primary" href="{% url 'admin:utilisateurs_utilisateur_add' %}"><i class="bi bi-person-plus" aria-hidden="true"></i>Nouvel utilisateur</a></div>
+</div>
+<div class="table-scroll" tabindex="0">
+  <table class="table table-hover">
+    <caption class="visually-hidden">Liste des utilisateurs</caption>
+    <thead><tr><th scope="col">Utilisateur</th><th scope="col">Rôles</th><th scope="col">Dernière connexion</th><th scope="col">Statut</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+    <tbody>
+    {% for u in utilisateurs %}
+      <tr>
+        <td><span class="avatar avatar-square" aria-hidden="true">{{ u.nom_complet|default:u.username|slice:":1"|upper }}</span>
+          <span class="user-table-meta"><strong>{{ u.nom_complet|default:u.username }}</strong><span class="cell-sub">{{ u.username }}{% if u.email %} · {{ u.email }}{% endif %}</span></span></td>
+        <td>{% for r in u.roles.all %}<span class="role-chip">{{ r.nom }}</span>{% empty %}{% if u.is_superuser %}<span class="role-chip">Administrateur</span>{% else %}<span class="cell-sub">Aucun rôle</span>{% endif %}{% endfor %}</td>
+        <td>{% if u.last_login %}{{ u.last_login|date:"d/m/Y H:i" }}{% else %}<span class="cell-sub">Jamais</span>{% endif %}</td>
+        <td>{% if u.is_active %}<span class="statut statut-actif"><i class="bi bi-check-circle" aria-hidden="true"></i>Actif</span>{% else %}<span class="statut statut-inactif"><i class="bi bi-pause-circle" aria-hidden="true"></i>Désactivé</span>{% endif %}</td>
+        <td><div class="actions">
+          <a class="btn btn-outline-secondary" href="{% url 'admin:utilisateurs_utilisateur_change' u.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i>Modifier</a>
+          {% if u.pk != user.pk %}
+          <form method="post" action="{% url 'utilisateurs:basculer' u.pk %}" data-confirm="{% if u.is_active %}Désactiver le compte de {{ u }} ? Cette personne ne pourra plus se connecter.{% else %}Réactiver le compte de {{ u }} ?{% endif %}">
+            {% csrf_token %}
+            <button type="submit" class="btn {% if u.is_active %}btn-outline-danger{% else %}btn-outline-secondary{% endif %}">{% if u.is_active %}Désactiver{% else %}Activer{% endif %}</button>
+          </form>
+          {% endif %}
+        </div></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

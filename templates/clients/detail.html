@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}{{ client.nom }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'clients:liste' %}">Clients</a></li><li aria-current="page">{{ client.nom }}</li></ol></nav>
+    <h1>{{ client.nom }}</h1>
+    <p class="lede">{% if client.actif %}<span class="statut statut-actif"><i class="bi bi-check-circle" aria-hidden="true"></i>Actif</span>{% else %}<span class="statut statut-inactif"><i class="bi bi-pause-circle" aria-hidden="true"></i>Inactif</span>{% endif %}</p></div>
+  <div class="page-head-actions"><a class="btn btn-outline-secondary" href="{% url 'clients:modifier' client.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i>Modifier</a></div>
+</div>
+<section class="panel"><h2>Coordonnées</h2>
+  <dl class="dl-grid"><dt>Téléphone</dt><dd>{{ client.telephone|default:"—" }}</dd><dt>E-mail</dt><dd>{{ client.email|default:"—" }}</dd><dt>Adresse</dt><dd>{{ client.adresse|default:"—"|linebreaksbr }}</dd></dl></section>
+<section class="table-panel panel">
+  <div class="section-head"><h2>Historique des ventes</h2></div>
+  {% with ventes=client.ventes.all %}
+  {% if ventes %}
+  <div class="table-scroll" tabindex="0"><table class="table">
+    <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col" class="num">Total</th><th scope="col">Statut</th></tr></thead>
+    <tbody>{% for v in ventes %}<tr><td><a href="{% url 'ventes:detail' v.pk %}">{{ v.numero }}</a></td><td>{{ v.date_vente|date:"d/m/Y H:i" }}</td><td class="num">{{ v.total|ar }}</td><td><span class="statut statut-{{ v.statut }}">{{ v.get_statut_display }}</span></td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="empty-inline"><i class="bi bi-info-circle" aria-hidden="true"></i>Aucune vente rattachée à ce client.</p>{% endif %}
+  {% endwith %}
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Caisse{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Caisse</h1><p class="lede">Recherchez un médicament par nom ou code-barres. Le lot qui expire en premier est proposé d’office (FEFO).</p></div>
+</div>
+<form method="post" id="caisseForm" data-search-url="{% url 'ventes:recherche_caisse' %}" novalidate>
+  {% csrf_token %}
+  <div class="caisse-layout">
+    <section class="panel caisse-search-panel" aria-labelledby="titreRecherche">
+      <h2 id="titreRecherche">Produit</h2>
+      <div class="input-group">
+        <span class="input-group-text" aria-hidden="true"><i class="bi bi-upc-scan"></i></span>
+        <input type="search" id="caisseRecherche" class="form-control" placeholder="Nom ou code-barres" autocomplete="off" autofocus aria-describedby="caisseAide" aria-controls="caisseResultats">
+      </div>
+      <p class="form-text" id="caisseAide">Tapez au moins 2 caractères. Un lecteur de code-barres valide avec Entrée.</p>
+      <p class="field-error" id="caisseErreur" role="alert" hidden></p>
+      <ul class="caisse-resultats" id="caisseResultats" aria-live="polite"></ul>
+      <p class="caisse-shortcut"><i class="bi bi-info-circle" aria-hidden="true"></i><span>Seuls les lots non périmés, non bloqués et en stock sont proposés. Les prix sont ceux de la fiche médicament au moment de la vente.</span></p>
+    </section>
+
+    <section class="panel panier-panel" aria-labelledby="titrePanier">
+      <div class="section-head">
+        <h2 id="titrePanier" class="d-flex align-items-center gap-2"><span class="cart-icon"><i class="bi bi-cart3" aria-hidden="true"></i></span>Panier</h2>
+        <span class="count-pill" id="panierCompte">0 article</span>
+      </div>
+      <div class="empty-cart" id="panierVide"><i class="bi bi-basket" aria-hidden="true"></i><strong>Panier vide</strong><span>Ajoutez un produit depuis la recherche.</span></div>
+      <div id="panierLignes"></div>
+
+      <div class="totaux"><div class="grand"><span>Total à payer</span><strong id="panierTotal">0 Ar</strong></div></div>
+
+      <div class="field">
+        <label class="form-label" for="client">Client (facultatif)</label>
+        <select class="form-select" id="client" name="client"><option value="">Vente comptoir — client non identifié</option>{% for c in clients %}<option value="{{ c.pk }}">{{ c.nom }}{% if c.telephone %} · {{ c.telephone }}{% endif %}</option>{% endfor %}</select>
+      </div>
+
+      <fieldset class="payment-fieldset">
+        <legend class="form-label">Mode de paiement</legend>
+        <div class="pay-grid">
+          <label class="pay-card"><input type="radio" name="mode" value="especes" checked><i class="bi bi-cash-coin" aria-hidden="true"></i><span>Espèces</span></label>
+          <label class="pay-card"><input type="radio" name="mode" value="mobile_money"><i class="bi bi-phone" aria-hidden="true"></i><span>Mobile money</span></label>
+          <label class="pay-card"><input type="radio" name="mode" value="carte"><i class="bi bi-credit-card" aria-hidden="true"></i><span>Carte</span></label>
+          <label class="pay-card"><input type="radio" name="mode" value="cheque"><i class="bi bi-journal-text" aria-hidden="true"></i><span>Chèque</span></label>
+        </div>
+      </fieldset>
+
+      <div class="field" id="blocEspeces">
+        <label class="form-label" for="montantRecu">Montant reçu (facultatif)</label>
+        <div class="input-suffix"><input class="form-control" type="number" min="0" step="100" inputmode="numeric" id="montantRecu"><span>Ar</span></div>
+        <div class="form-text" id="monnaie" aria-live="polite"></div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" id="caisseValider" disabled><i class="bi bi-check2-circle" aria-hidden="true"></i>Valider la vente</button>
+      <p class="payment-hint">Mobile money, carte et chèque sont enregistrés comme paiements simulés : aucune vérification auprès d’un opérateur n’est faite dans cette version.</p>
+    </section>
+  </div>
+</form>
+{% endblock %}

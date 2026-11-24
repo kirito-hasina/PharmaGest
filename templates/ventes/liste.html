@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Ventes{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Historique des ventes</h1><p class="lede">Une vente validée n’est jamais supprimée : on la corrige par un retour tracé.</p></div>
+  <div class="page-head-actions"><a class="btn btn-primary" href="{% url 'ventes:creer' %}"><i class="bi bi-cart3" aria-hidden="true"></i>Nouvelle vente</a></div>
+</div>
+{% if ventes %}
+<div class="table-scroll" tabindex="0"><table class="table table-hover">
+  <caption class="visually-hidden">Ventes</caption>
+  <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col">Client</th><th scope="col">Caissier</th><th scope="col" class="num">Total</th><th scope="col">Statut</th></tr></thead>
+  <tbody>{% for v in ventes %}
+    <tr><td><a class="cell-title text-decoration-none" href="{% url 'ventes:detail' v.pk %}">{{ v.numero }}</a></td><td>{{ v.date_vente|date:"d/m/Y H:i" }}</td><td>{{ v.client|default:"Comptoir" }}</td><td>{{ v.utilisateur }}</td><td class="num">{{ v.total|ar }}</td><td><span class="statut statut-{{ v.statut }}">{{ v.get_statut_display }}</span></td></tr>
+  {% endfor %}</tbody>
+</table></div>
+{% include "partials/_pagination.html" %}
+{% else %}
+<div class="empty-state"><i class="bi bi-receipt" aria-hidden="true"></i><h2>Aucune vente</h2><p>Les ventes apparaissent ici dès le premier encaissement.</p><a class="btn btn-primary" href="{% url 'ventes:creer' %}">Ouvrir la caisse</a></div>
+{% endif %}
+{% endblock %}

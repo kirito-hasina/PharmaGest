@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Tableau de bord</h1><p class="lede">{% now "l j F Y" %} — chiffres calculés à partir des données réelles.</p></div></div>
+<div class="grid-stats">
+  <a class="stat-card" href="{% if acces.medicaments %}{% url 'medicaments:liste' %}{% else %}#{% endif %}"><span class="stat-icon"><i class="bi bi-capsule" aria-hidden="true"></i></span><span class="stat-value">{{ stats.medicaments_actifs }}</span><span class="stat-label">Médicaments actifs</span></a>
+  <a class="stat-card tone-ok" href="{% url 'ventes:liste' %}"><span class="stat-icon"><i class="bi bi-cash-coin" aria-hidden="true"></i></span><span class="stat-value">{{ stats.ventes_jour }}</span><span class="stat-label">Ventes du jour</span><span class="stat-hint">Chiffre d’affaires encaissé</span></a>
+  <a class="stat-card tone-warning" href="{% url 'stock:liste' %}?stk=faible"><span class="stat-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span><span class="stat-value">{{ stats.stocks_faibles }}</span><span class="stat-label">Stocks faibles</span><span class="stat-hint">À réapprovisionner</span></a>
+  <a class="stat-card tone-caution" href="{% url 'stock:liste' %}?exp=proche"><span class="stat-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span><span class="stat-value">{{ stats.peremptions_proches }}</span><span class="stat-label">Péremptions proches</span><span class="stat-hint">Dans les 90 jours</span></a>
+</div>
+<div class="grid-stats dashboard-secondary-stats">
+  <a class="stat-card tone-danger" href="{% url 'stock:liste' %}?stk=rupture"><span class="stat-icon"><i class="bi bi-x-circle" aria-hidden="true"></i></span><span class="stat-value">{{ stats.ruptures }}</span><span class="stat-label">Lots épuisés</span></a>
+  <a class="stat-card" href="{% url 'achats:liste' %}"><span class="stat-icon"><i class="bi bi-truck" aria-hidden="true"></i></span><span class="stat-value">{{ stats.achats_periode }}</span><span class="stat-label">Achats commandés (30 jours)</span></a>
+</div>
+<div class="layout-2">
+  <section class="panel" aria-labelledby="titreVentes">
+    <div class="section-head"><div><h2 id="titreVentes">Ventes</h2><p class="section-note">Montants des ventes payées par jour.</p></div>
+      <div class="period-toggle" role="group" aria-label="Période du graphique"><button type="button" class="btn btn-outline-secondary" data-periode="j14" aria-pressed="false">14 jours</button><button type="button" class="btn btn-primary" data-periode="j30" aria-pressed="true">30 jours</button></div></div>
+    <div class="chart-box" id="chartVentes" role="img" aria-label="Courbe des ventes quotidiennes"></div>
+    <p class="data-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Ces montants sont un chiffre d’affaires : ce n’est ni un encaissement net de retours ni un bénéfice.</p>
+  </section>
+  <section class="panel" aria-labelledby="titreTop">
+    <div class="section-head"><h2 id="titreTop">Produits les plus vendus</h2></div>
+    {% for p in plus_vendus %}
+    <div class="rank"><div class="rank-top"><span>{{ p.nom }}</span><span class="rank-meta">{{ p.quantite }} vendu{{ p.quantite|pluralize }}</span></div><div class="meter" aria-hidden="true"><span style="width: {{ p.pourcentage }}%"></span></div></div>
+    {% empty %}<p class="empty-inline"><i class="bi bi-info-circle" aria-hidden="true"></i>Aucune vente enregistrée pour l’instant.</p>{% endfor %}
+  </section>
+</div>
+<div class="layout-2 dashboard-lower">
+  <section class="panel" aria-labelledby="titreAlertes">
+    <div class="section-head"><h2 id="titreAlertes">Alertes</h2><a class="text-link" href="{% url 'stock:liste' %}">Voir le stock</a></div>
+    {% for icone, couleur, titre, texte, lien in alertes_stock %}
+    <a class="alert-row" href="{{ lien }}"><span class="alert-symbol" style="color: {{ couleur }}"><i class="bi {{ icone }}" aria-hidden="true"></i></span><span><strong>{{ titre }}</strong><small>{{ texte }}</small></span></a>
+    {% empty %}<p class="empty-inline"><i class="bi bi-check-circle" aria-hidden="true"></i>Aucune alerte : stocks et péremptions sont sous contrôle.</p>{% endfor %}
+  </section>
+  <section class="panel" aria-labelledby="titreRecents">
+    <div class="section-head"><h2 id="titreRecents">Catalogue</h2>{% if acces.medicaments %}<a class="text-link" href="{% url 'medicaments:liste' %}">Tout voir</a>{% endif %}</div>
+    {% for m in medicaments %}
+    <p class="d-flex justify-content-between gap-2 mb-2"><span>{{ m.nom_commercial }} <span class="cell-sub d-inline">{{ m.dosage }}</span></span><strong class="num">{{ m.prix_vente|ar }}</strong></p>
+    {% empty %}<p class="empty-inline"><i class="bi bi-info-circle" aria-hidden="true"></i>Aucun médicament actif.</p>{% endfor %}
+  </section>
+</div>
+{{ ventes_graphique|json_script:"donneesVentes" }}
+{% endblock %}

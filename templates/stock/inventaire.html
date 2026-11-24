@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Inventaire physique{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Inventaire physique</h1><p class="lede">Comptez les boîtes d’un lot sur l’étagère et saisissez le résultat. L’écart est enregistré comme mouvement de correction.</p></div></div>
+<form method="post" class="panel form-narrow" id="inventaireForm" data-confirm="Enregistrer ce décompte ? Le stock du lot sera remplacé par la valeur saisie.">
+  {% csrf_token %}
+  <div class="field"><label class="form-label" for="lot">Lot <abbr title="obligatoire">*</abbr></label>
+    <select class="form-select" id="lot" name="lot" required>
+      <option value="">Choisir un lot…</option>
+      {% for l in lots %}<option value="{{ l.pk }}" data-dispo="{{ l.quantite_disponible }}">{{ l.medicament }} · lot {{ l.numero_lot }} · exp. {{ l.date_peremption|date:"d/m/Y" }} · {{ l.quantite_disponible }} en stock</option>{% endfor %}
+    </select></div>
+  <div class="field"><label class="form-label" for="quantite">Quantité comptée <abbr title="obligatoire">*</abbr></label>
+    <input class="form-control" type="number" id="quantite" name="quantite" min="0" step="1" inputmode="numeric" required>
+    <div class="form-text" id="ecartInventaire" aria-live="polite">Saisissez la quantité réellement présente.</div></div>
+  <div class="form-actions"><button type="submit" class="btn btn-primary"><i class="bi bi-clipboard-check" aria-hidden="true"></i>Enregistrer le décompte</button></div>
+</form>
+{% endblock %}

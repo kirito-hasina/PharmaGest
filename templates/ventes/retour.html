@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Retour — {{ vente.numero }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'ventes:liste' %}">Ventes</a></li><li><a href="{% url 'ventes:detail' vente.pk %}">{{ vente.numero }}</a></li><li aria-current="page">Retour</li></ol></nav><h1>Enregistrer un retour</h1><p class="lede">La vente d’origine est conservée ; le retour est une opération distincte et tracée.</p></div></div>
+{% if vente.statut != 'payee' %}
+<div class="empty-state form-narrow"><i class="bi bi-info-circle" aria-hidden="true"></i><h2>Retour impossible</h2><p>Seule une vente payée peut faire l’objet d’un retour.</p><a class="btn btn-primary" href="{% url 'ventes:detail' vente.pk %}">Voir la vente</a></div>
+{% else %}
+<form method="post" class="panel form-narrow" novalidate>
+  {% csrf_token %}
+  <div class="field"><label class="form-label" for="ligne">Ligne concernée <abbr title="obligatoire">*</abbr></label>
+    <select class="form-select" id="ligne" name="ligne" required>
+      <option value="">Choisir…</option>
+      {% for l in vente.lignes.all %}{% with possible=l|qte_retournable %}<option value="{{ l.pk }}" {% if possible == 0 %}disabled{% endif %}>{{ l.lot.medicament }} · lot {{ l.lot.numero_lot }} — vendu {{ l.quantite }}, retournable {{ possible }}</option>{% endwith %}{% endfor %}
+    </select></div>
+  <div class="field"><label class="form-label" for="quantite">Quantité retournée <abbr title="obligatoire">*</abbr></label><input class="form-control" type="number" id="quantite" name="quantite" min="1" step="1" inputmode="numeric" required></div>
+  <div class="field"><label class="form-label" for="motif">Motif <abbr title="obligatoire">*</abbr></label><textarea class="form-control" id="motif" name="motif" rows="3" required></textarea></div>
+  <p class="stock-return"><small><i class="bi bi-info-circle" aria-hidden="true"></i> Le produit retourné n’est pas remis en stock automatiquement : il reste exclu du stock délivrable en attendant un contrôle.</small></p>
+  <div class="form-actions"><a class="btn btn-outline-secondary" href="{% url 'ventes:detail' vente.pk %}">Annuler</a><button type="submit" class="btn btn-primary">Enregistrer le retour</button></div>
+</form>
+{% endif %}
+{% endblock %}

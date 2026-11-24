@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}{{ medicament }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'medicaments:liste' %}">Médicaments</a></li><li aria-current="page">{{ medicament }}</li></ol></nav><h1>{{ medicament }}</h1><p class="lede"><span class="statut statut-{{ medicament.statut }}">{{ medicament.get_statut_display }}</span></p></div>
+  <div class="page-head-actions">
+    <a class="btn btn-outline-secondary" href="{% url 'medicaments:modifier' medicament.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i>Modifier</a>
+    {% if medicament.statut == 'actif' %}<form method="post" action="{% url 'medicaments:archiver' medicament.pk %}" data-confirm="Archiver « {{ medicament }} » ? Il ne sera plus proposé à la vente ni aux commandes, mais son historique est conservé.">{% csrf_token %}<button type="submit" class="btn btn-outline-danger"><i class="bi bi-archive" aria-hidden="true"></i>Archiver</button></form>{% endif %}
+  </div>
+</div>
+<div class="layout-2">
+  <section class="panel">
+    <div class="fiche-grid">
+      <span class="fiche-photo">{% if medicament.photo %}<img src="{{ medicament.photo.url }}" alt="Photo de {{ medicament }}" style="width:100%;height:100%;object-fit:cover;border-radius:12px">{% else %}<i class="bi bi-capsule" style="font-size:2rem" aria-hidden="true"></i>{% endif %}</span>
+      <dl class="dl-grid">
+        <dt>Dénomination générique</dt><dd>{{ medicament.denomination_generique|default:"—" }}</dd>
+        <dt>Catégorie</dt><dd>{{ medicament.categorie }}</dd>
+        <dt>Forme · dosage</dt><dd>{{ medicament.forme }} · {{ medicament.dosage }}</dd>
+        <dt>Laboratoire</dt><dd>{{ medicament.laboratoire|default:"—" }}</dd>
+        <dt>Code-barres</dt><dd>{{ medicament.code_barres|default:"—" }}</dd>
+        <dt>Prix d’achat</dt><dd class="num">{{ medicament.prix_achat|ar }}</dd>
+        <dt>Prix de vente</dt><dd class="num">{{ medicament.prix_vente|ar }}</dd>
+        <dt>Seuil d’alerte</dt><dd>{{ medicament.seuil_alerte }}</dd>
+        <dt>Créé le</dt><dd>{{ medicament.date_creation|date:"d/m/Y" }}</dd>
+      </dl>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Stock délivrable</h2>
+    <p class="stat-value">{{ medicament|stock_delivrable }}</p>
+    <p class="stat-hint">Lots non périmés et non bloqués. Seuil d’alerte : {{ medicament.seuil_alerte }}.</p>
+  </section>
+</div>
+<section class="table-panel panel">
+  <div class="section-head"><div><h2>Lots</h2><p class="section-note">Classés par date de péremption : le premier est vendu en priorité.</p></div></div>
+  {% if medicament.lots.all %}
+  <div class="table-scroll" tabindex="0"><table class="table">
+    <thead><tr><th scope="col">Lot</th><th scope="col">Péremption</th><th scope="col" class="num">Reçu</th><th scope="col" class="num">Disponible</th><th scope="col">Statut</th><th scope="col"></th></tr></thead>
+    <tbody>{% for lot in medicament.lots.all %}
+      <tr><td>{{ lot.numero_lot }}</td><td>{{ lot.date_peremption|date:"d/m/Y" }}</td><td class="num">{{ lot.quantite_recue }}</td><td class="num">{{ lot.quantite_disponible }}</td><td>{% lot_badge lot %}</td><td><a class="text-link" href="{% url 'stock:detail' lot.pk %}">Détail</a></td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="empty-inline"><i class="bi bi-info-circle" aria-hidden="true"></i>Aucun lot reçu pour ce médicament.</p>{% endif %}
+</section>
+{% endblock %}

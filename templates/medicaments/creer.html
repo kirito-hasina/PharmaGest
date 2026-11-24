@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Nouveau médicament{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'medicaments:liste' %}">Médicaments</a></li><li aria-current="page">Nouveau</li></ol></nav><h1>Nouveau médicament</h1></div>
+</div>
+<form method="post" enctype="multipart/form-data" class="panel form-panel" novalidate>
+  {% csrf_token %}
+  {% include "medicaments/_form.html" with d=form_data %}
+  <div class="form-actions"><a class="btn btn-outline-secondary" href="{% url 'medicaments:liste' %}">Annuler</a><button type="submit" class="btn btn-primary"><i class="bi bi-check2" aria-hidden="true"></i>Enregistrer</button></div>
+</form>
+{% endblock %}

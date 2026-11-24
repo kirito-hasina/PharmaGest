@@ -1,0 +1,48 @@
+{% load l10n %}
+{% firstof d.categorie_id d.categorie as cat_courante %}
+<div class="photo-field">
+  {% if medicament and medicament.photo %}<img class="photo-preview" id="apercuPhoto" src="{{ medicament.photo.url }}" alt="Photo actuelle">
+  {% else %}<img class="photo-preview" id="apercuPhoto" alt="" hidden>{% endif %}
+  <span class="photo-placeholder" id="apercuVide" {% if medicament and medicament.photo %}hidden{% endif %}><i class="bi bi-image" aria-hidden="true"></i></span>
+  <div class="grow">
+    <label class="form-label" for="photo">Photo (facultative)</label>
+    <input class="form-control" type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp" data-photo-input>
+    <div class="form-text">JPG, PNG ou WEBP, 2 Mo maximum.</div>
+    <p class="field-error" id="erreurPhoto" role="alert" hidden></p>
+  </div>
+</div>
+<div class="form-grid">
+  <div class="field"><label class="form-label" for="nom_commercial">Nom commercial <abbr title="obligatoire">*</abbr></label>
+    <input class="form-control" id="nom_commercial" name="nom_commercial" maxlength="150" required value="{{ d.nom_commercial|default:'' }}"></div>
+  <div class="field"><label class="form-label" for="denomination_generique">Dénomination générique</label>
+    <input class="form-control" id="denomination_generique" name="denomination_generique" maxlength="150" value="{{ d.denomination_generique|default:'' }}"></div>
+  <div class="field"><label class="form-label" for="forme">Forme pharmaceutique <abbr title="obligatoire">*</abbr></label>
+    <input class="form-control" id="forme" name="forme" list="formes" maxlength="50" required placeholder="Comprimé, sirop, gélule…" value="{{ d.forme|default:'' }}">
+    <datalist id="formes"><option value="Comprimé"><option value="Gélule"><option value="Sirop"><option value="Solution injectable"><option value="Pommade"><option value="Suppositoire"><option value="Spray"><option value="Sachet"></datalist></div>
+  <div class="field"><label class="form-label" for="dosage">Dosage <abbr title="obligatoire">*</abbr></label>
+    <input class="form-control" id="dosage" name="dosage" maxlength="50" required placeholder="500 mg" value="{{ d.dosage|default:'' }}"></div>
+  <div class="field"><label class="form-label" for="categorie">Catégorie <abbr title="obligatoire">*</abbr></label>
+    <select class="form-select" id="categorie" name="categorie" required>
+      <option value="">Choisir…</option>
+      {% for c in categories %}<option value="{{ c.pk }}" {% if c.pk|stringformat:"s" == cat_courante|stringformat:"s" %}selected{% endif %}>{{ c.nom }}</option>{% endfor %}
+    </select></div>
+  <div class="field"><label class="form-label" for="laboratoire">Laboratoire</label>
+    <input class="form-control" id="laboratoire" name="laboratoire" maxlength="150" value="{{ d.laboratoire|default:'' }}"></div>
+  <div class="field"><label class="form-label" for="prix_achat">Prix d’achat <abbr title="obligatoire">*</abbr></label>
+    <div class="input-suffix"><input class="form-control" type="number" inputmode="decimal" min="0.01" step="0.01" id="prix_achat" name="prix_achat" required value="{{ d.prix_achat|unlocalize }}"><span>Ar</span></div></div>
+  <div class="field"><label class="form-label" for="prix_vente">Prix de vente <abbr title="obligatoire">*</abbr></label>
+    <div class="input-suffix"><input class="form-control" type="number" inputmode="decimal" min="0.01" step="0.01" id="prix_vente" name="prix_vente" required value="{{ d.prix_vente|unlocalize }}"><span>Ar</span></div>
+    <div class="form-text">Doit être supérieur ou égal au prix d’achat.</div></div>
+  <div class="field"><label class="form-label" for="seuil_alerte">Seuil d’alerte</label>
+    <input class="form-control" type="number" min="0" step="1" id="seuil_alerte" name="seuil_alerte" value="{{ d.seuil_alerte|default:0|unlocalize }}">
+    <div class="form-text">Une alerte apparaît quand le stock total atteint ce seuil.</div></div>
+  <div class="field"><label class="form-label" for="code_barres">Code-barres</label>
+    <input class="form-control" id="code_barres" name="code_barres" maxlength="100" inputmode="numeric" value="{{ d.code_barres|default:'' }}">
+    <div class="form-text">Unique lorsqu’il est renseigné.</div></div>
+  <div class="field"><label class="form-label" for="statut">Statut</label>
+    <select class="form-select" id="statut" name="statut">
+      <option value="actif" {% if d.statut|default:'actif' == 'actif' %}selected{% endif %}>Actif</option>
+      <option value="inactif" {% if d.statut == 'inactif' %}selected{% endif %}>Inactif (archivé)</option>
+      <option value="retire" {% if d.statut == 'retire' %}selected{% endif %}>Retiré du marché</option>
+    </select></div>
+</div>

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Rapport de stock{% endblock %}
+{% block content %}
+{% include "rapports/_entete.html" with titre="Rapport de stock" kind="stock" %}
+{% if lots %}{% include "stock/_table_lots.html" %}<p class="data-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Les 200 premiers lots (par date de péremption) sont affichés ; le PDF contient tous les lots.</p>
+{% else %}<div class="empty-state"><i class="bi bi-box-seam" aria-hidden="true"></i><h2>Aucun lot</h2></div>{% endif %}
+{% endblock %}

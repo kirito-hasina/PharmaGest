@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Modifier {{ client.nom }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'clients:liste' %}">Clients</a></li><li><a href="{% url 'clients:detail' client.pk %}">{{ client.nom }}</a></li><li aria-current="page">Modifier</li></ol></nav><h1>Modifier le client</h1></div></div>
+<form method="post" class="panel form-narrow" novalidate>
+  {% csrf_token %}
+  {% include "partials/_form.html" %}
+  <div class="form-actions"><a class="btn btn-outline-secondary" href="{% url 'clients:detail' client.pk %}">Annuler</a><button type="submit" class="btn btn-primary">Enregistrer</button></div>
+</form>
+{% endblock %}

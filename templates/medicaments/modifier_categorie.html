@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Modifier la catégorie{% endblock %}
+{% block content %}
+<div class="page-head"><div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'medicaments:categories' %}">Catégories</a></li><li aria-current="page">{{ categorie.nom }}</li></ol></nav><h1>Modifier la catégorie</h1></div></div>
+<form method="post" class="panel form-narrow" novalidate>
+  {% csrf_token %}
+  <div class="field"><label class="form-label" for="nom">Nom <abbr title="obligatoire">*</abbr></label><input class="form-control" id="nom" name="nom" maxlength="100" required value="{{ categorie.nom }}"></div>
+  <div class="field"><label class="form-label" for="description">Description</label><textarea class="form-control" id="description" name="description" rows="3">{{ categorie.description }}</textarea></div>
+  <div class="form-actions"><a class="btn btn-outline-secondary" href="{% url 'medicaments:categories' %}">Annuler</a><button type="submit" class="btn btn-primary">Enregistrer</button></div>
+</form>
+{% endblock %}

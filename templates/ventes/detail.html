@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Vente {{ vente.numero }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'ventes:liste' %}">Ventes</a></li><li aria-current="page">{{ vente.numero }}</li></ol></nav>
+    <h1>{{ vente.numero }}</h1><p class="lede"><span class="statut statut-{{ vente.statut }}">{{ vente.get_statut_display }}</span></p></div>
+  <div class="page-head-actions">
+    {% if vente.statut == 'payee' %}
+      <a class="btn btn-primary" href="{% url 'ventes:recu' vente.pk %}" target="_blank" rel="noopener"><i class="bi bi-printer" aria-hidden="true"></i>Reçu PDF</a>
+      <a class="btn btn-outline-secondary" href="{% url 'ventes:retour' vente.pk %}"><i class="bi bi-arrow-return-left" aria-hidden="true"></i>Enregistrer un retour</a>
+    {% elif vente.statut == 'en_cours' %}
+      <a class="btn btn-primary" href="{% url 'ventes:payer' vente.pk %}"><i class="bi bi-cash-coin" aria-hidden="true"></i>Encaisser</a>
+    {% endif %}
+    <a class="btn btn-outline-secondary" href="{% url 'ventes:creer' %}"><i class="bi bi-cart3" aria-hidden="true"></i>Nouvelle vente</a>
+  </div>
+</div>
+<div class="layout-2">
+  <section class="panel"><h2>Informations</h2>
+    <dl class="dl-grid">
+      <dt>Date</dt><dd>{{ vente.date_vente|date:"d/m/Y H:i" }}</dd>
+      <dt>Caissier</dt><dd>{{ vente.utilisateur }}</dd>
+      <dt>Client</dt><dd>{% if vente.client %}{% if acces.clients %}<a href="{% url 'clients:detail' vente.client.pk %}">{{ vente.client }}</a>{% else %}{{ vente.client }}{% endif %}{% else %}Vente comptoir{% endif %}</dd>
+      <dt>Total</dt><dd class="num"><strong>{{ vente.total|ar }}</strong></dd>
+    </dl></section>
+  <section class="panel"><h2>Paiement</h2>
+    {% for p in vente.paiements.all %}
+      <p class="d-flex justify-content-between gap-2 mb-2"><span>{{ p.get_mode_display }} <span class="statut statut-{{ p.statut }} ms-1">{{ p.get_statut_display }}</span></span><strong class="num">{{ p.montant|ar }}</strong></p>
+    {% empty %}<p class="empty-inline"><i class="bi bi-info-circle" aria-hidden="true"></i>Aucun paiement enregistré.</p>{% endfor %}
+  </section>
+</div>
+<section class="table-panel panel">
+  <div class="section-head"><h2>Lignes</h2></div>
+  <div class="table-scroll" tabindex="0"><table class="table">
+    <thead><tr><th scope="col">Médicament</th><th scope="col">Lot</th><th scope="col" class="num">Qté</th><th scope="col" class="num">Prix appliqué</th><th scope="col" class="num">Sous-total</th><th scope="col" class="num">Retournée</th></tr></thead>
+    <tbody>{% for l in vente.lignes.all %}
+      <tr><td>{{ l.lot.medicament }}</td><td>{{ l.lot.numero_lot }}</td><td class="num">{{ l.quantite }}</td><td class="num">{{ l.prix_applique|ar }}</td><td class="num">{{ l.quantite|mul:l.prix_applique|ar }}</td><td class="num">{{ l|qte_retournee }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+</section>
+{% endblock %}

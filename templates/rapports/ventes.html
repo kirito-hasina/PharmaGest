@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Rapport des ventes{% endblock %}
+{% block content %}
+{% include "rapports/_entete.html" with titre="Rapport des ventes" kind="ventes" %}
+{% if ventes %}
+<div class="table-scroll" tabindex="0"><table class="table">
+  <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col">Client</th><th scope="col">Caissier</th><th scope="col" class="num">Total</th><th scope="col">Statut</th></tr></thead>
+  <tbody>{% for v in ventes %}<tr><td>{{ v.numero }}</td><td>{{ v.date_vente|date:"d/m/Y H:i" }}</td><td>{{ v.client|default:"Comptoir" }}</td><td>{{ v.utilisateur }}</td><td class="num">{{ v.total|ar }}</td><td><span class="statut statut-{{ v.statut }}">{{ v.get_statut_display }}</span></td></tr>{% endfor %}</tbody>
+  <tfoot><tr><th scope="row" colspan="4" class="text-end">Chiffre d’affaires (ventes payées)</th><td class="num"><strong>{{ ventes|ca_ventes|ar }}</strong></td><td></td></tr></tfoot>
+</table></div>
+<p class="data-note"><i class="bi bi-info-circle" aria-hidden="true"></i>Les 200 ventes les plus récentes sont affichées. Le chiffre d’affaires n’est pas un bénéfice.</p>
+{% else %}<div class="empty-state"><i class="bi bi-receipt" aria-hidden="true"></i><h2>Aucune vente</h2></div>{% endif %}
+{% endblock %}

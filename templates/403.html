@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Accès refusé{% endblock %}
+{% block content %}
+<div class="empty-state error-page">
+  <i class="bi bi-shield-lock" aria-hidden="true"></i>
+  <h1>Accès refusé</h1>
+  <p>Votre rôle ne donne pas accès à cette page. Si vous pensez que c’est une erreur, contactez l’administrateur de la pharmacie.</p>
+  <a class="btn btn-primary" href="{% url 'rapports:dashboard' %}">Retour à l’accueil</a>
+</div>
+{% endblock %}

@@ -1,0 +1,4 @@
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'rapports:liste' %}">Rapports</a></li><li aria-current="page">{{ titre }}</li></ol></nav><h1>{{ titre }}</h1><p class="lede">Généré le {% now "d/m/Y à H:i" %}.</p></div>
+  <div class="page-head-actions"><button type="button" class="btn btn-outline-secondary" data-imprimer><i class="bi bi-printer" aria-hidden="true"></i>Imprimer</button><a class="btn btn-primary" href="{% url 'rapports:pdf' kind %}"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>Télécharger en PDF</a></div>
+</div>

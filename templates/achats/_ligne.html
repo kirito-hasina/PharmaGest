@@ -1,0 +1,14 @@
+{% load l10n %}
+<tr data-ligne>
+  <td style="min-width:260px">
+    <label class="visually-hidden">Médicament</label>
+    <select class="form-select" name="medicament" required>
+      <option value="">Choisir…</option>
+      {% for m in medicaments %}<option value="{{ m.pk }}" data-prix="{{ m.prix_achat|unlocalize }}" {% if l and l.medicament_id == m.pk %}selected{% endif %}>{{ m }}</option>{% endfor %}
+    </select>
+  </td>
+  <td style="width:140px"><label class="visually-hidden">Quantité</label><input class="form-control" type="number" name="quantite" min="1" step="1" inputmode="numeric" required value="{% if l %}{{ l.quantite_commandee|unlocalize }}{% else %}1{% endif %}"></td>
+  <td style="width:190px"><label class="visually-hidden">Prix d’achat unitaire</label><div class="input-suffix"><input class="form-control" type="number" name="prix" min="0.01" step="0.01" inputmode="decimal" required value="{% if l %}{{ l.prix_achat|unlocalize }}{% endif %}"><span>Ar</span></div></td>
+  <td class="num" data-soustotal>—</td>
+  <td style="width:56px"><button type="button" class="btn btn-icon-quiet" data-retirer aria-label="Retirer cette ligne"><i class="bi bi-trash" aria-hidden="true"></i></button></td>
+</tr>

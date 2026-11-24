@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Commandes d’achat{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Commandes d’achat</h1><p class="lede">Une commande n’augmente pas le stock : seule la réception effective le fait.</p></div>
+  <div class="page-head-actions">
+    <a class="btn btn-outline-secondary" href="{% url 'achats:reception_ecran' %}"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>Réceptions à faire</a>
+    <a class="btn btn-primary" href="{% url 'achats:creer' %}"><i class="bi bi-plus-lg" aria-hidden="true"></i>Nouvelle commande</a>
+  </div>
+</div>
+{% if commandes %}
+<div class="table-scroll" tabindex="0"><table class="table table-hover">
+  <caption class="visually-hidden">Commandes d’achat</caption>
+  <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col">Fournisseur</th><th scope="col" class="num">Montant</th><th scope="col">Statut</th><th scope="col">Créée par</th></tr></thead>
+  <tbody>{% for c in commandes %}
+    <tr><td><a class="cell-title text-decoration-none" href="{% url 'achats:detail' c.pk %}">{{ c.numero }}</a></td><td>{{ c.date_commande|date:"d/m/Y" }}</td><td>{{ c.fournisseur }}</td><td class="num">{{ c.montant_total|ar }}</td><td><span class="statut statut-{{ c.statut }}">{{ c.get_statut_display }}</span></td><td>{{ c.utilisateur }}</td></tr>
+  {% endfor %}</tbody>
+</table></div>
+{% include "partials/_pagination.html" %}
+{% else %}
+<div class="empty-state"><i class="bi bi-truck" aria-hidden="true"></i><h2>Aucune commande</h2><p>Créez une commande pour réapprovisionner la pharmacie.</p><a class="btn btn-primary" href="{% url 'achats:creer' %}">Nouvelle commande</a></div>
+{% endif %}
+{% endblock %}

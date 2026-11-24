@@ -1,0 +1,14 @@
+{% load pharma %}
+{% if page_obj.has_other_pages %}
+<nav aria-label="Pagination">
+  <ul class="pagination justify-content-end">
+    {% if page_obj.has_previous %}
+    <li class="page-item"><a class="page-link" href="{% page_url page_obj.previous_page_number %}" aria-label="Page précédente"><i class="bi bi-chevron-left" aria-hidden="true"></i></a></li>
+    {% endif %}
+    <li class="page-item active" aria-current="page"><span class="page-link px-3">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+    <li class="page-item"><a class="page-link" href="{% page_url page_obj.next_page_number %}" aria-label="Page suivante"><i class="bi bi-chevron-right" aria-hidden="true"></i></a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}

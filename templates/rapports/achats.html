@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Rapport des achats{% endblock %}
+{% block content %}
+{% include "rapports/_entete.html" with titre="Rapport des achats" kind="achats" %}
+{% if commandes %}
+<div class="table-scroll" tabindex="0"><table class="table">
+  <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col">Fournisseur</th><th scope="col">Créée par</th><th scope="col" class="num">Montant</th><th scope="col">Statut</th></tr></thead>
+  <tbody>{% for c in commandes %}<tr><td>{{ c.numero }}</td><td>{{ c.date_commande|date:"d/m/Y" }}</td><td>{{ c.fournisseur }}</td><td>{{ c.utilisateur }}</td><td class="num">{{ c.montant_total|ar }}</td><td><span class="statut statut-{{ c.statut }}">{{ c.get_statut_display }}</span></td></tr>{% endfor %}</tbody>
+  <tfoot><tr><th scope="row" colspan="4" class="text-end">Total commandé (hors annulées)</th><td class="num"><strong>{{ commandes|total_achats|ar }}</strong></td><td></td></tr></tfoot>
+</table></div>
+{% else %}<div class="empty-state"><i class="bi bi-truck" aria-hidden="true"></i><h2>Aucune commande</h2></div>{% endif %}
+{% endblock %}

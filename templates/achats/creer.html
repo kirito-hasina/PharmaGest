@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{% if commande %}Modifier {{ commande.numero }}{% else %}Nouvelle commande{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'achats:liste' %}">Commandes d’achat</a></li>{% if commande %}<li><a href="{% url 'achats:detail' commande.pk %}">{{ commande.numero }}</a></li>{% endif %}<li aria-current="page">{% if commande %}Modifier{% else %}Nouvelle{% endif %}</li></ol></nav>
+    <h1>{% if commande %}Modifier la commande {{ commande.numero }}{% else %}Nouvelle commande{% endif %}</h1></div>
+</div>
+{% if not fournisseurs %}
+<div class="empty-state"><i class="bi bi-shop" aria-hidden="true"></i><h2>Aucun fournisseur actif</h2><p>Créez d’abord un fournisseur avant de passer commande.</p>{% if acces.fournisseurs %}<a class="btn btn-primary" href="{% url 'fournisseurs:creer' %}">Nouveau fournisseur</a>{% endif %}</div>
+{% else %}
+<form method="post" id="commandeForm" novalidate>
+  {% csrf_token %}
+  <section class="panel form-panel">
+    <div class="field mb-0" style="max-width:420px">
+      <label class="form-label" for="fournisseur">Fournisseur <abbr title="obligatoire">*</abbr></label>
+      <select class="form-select" id="fournisseur" name="fournisseur" required>
+        <option value="">Choisir…</option>
+        {% for f in fournisseurs %}<option value="{{ f.pk }}" {% if commande and commande.fournisseur_id == f.pk %}selected{% elif request.POST.fournisseur == f.pk|stringformat:"s" %}selected{% endif %}>{{ f.raison_sociale }}</option>{% endfor %}
+      </select>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="section-head"><div><h2>Médicaments commandés</h2><p class="section-note">Le prix d’achat est proposé d’après la fiche du médicament ; vous pouvez l’ajuster.</p></div>
+      <button type="button" class="btn btn-outline-secondary" id="ajouterLigne"><i class="bi bi-plus-lg" aria-hidden="true"></i>Ajouter une ligne</button></div>
+    <div class="table-scroll" tabindex="0"><table class="table lines-table">
+      <thead><tr><th scope="col">Médicament</th><th scope="col">Quantité</th><th scope="col">Prix d’achat unitaire</th><th scope="col" class="num">Sous-total</th><th scope="col"><span class="visually-hidden">Retirer</span></th></tr></thead>
+      <tbody id="lignesCommande">{% if commande %}{% for l in commande.lignes.all %}{% include "achats/_ligne.html" with l=l %}{% endfor %}{% endif %}</tbody>
+    </table></div>
+    <div class="order-total"><span>Total de la commande</span><strong id="totalCommande">0 Ar</strong></div>
+  </section>
+  <div class="form-actions mt-3">
+    <a class="btn btn-outline-secondary" href="{% if commande %}{% url 'achats:detail' commande.pk %}{% else %}{% url 'achats:liste' %}{% endif %}">Annuler</a>
+    <button type="submit" name="statut" value="brouillon" class="btn btn-outline-secondary"><i class="bi bi-save" aria-hidden="true"></i>Enregistrer en brouillon</button>
+    <button type="submit" name="statut" value="envoyee" class="btn btn-primary"><i class="bi bi-check2" aria-hidden="true"></i>Valider la commande</button>
+  </div>
+</form>
+<template id="modeleLigne">{% include "achats/_ligne.html" %}</template>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% load pharma %}
+<div class="table-scroll" tabindex="0"><table class="table table-hover">
+  <caption class="visually-hidden">Lots en stock</caption>
+  <thead><tr><th scope="col">Médicament</th><th scope="col">Lot</th><th scope="col">Péremption</th><th scope="col" class="num">Disponible</th><th scope="col">Statut</th><th scope="col"></th></tr></thead>
+  <tbody>{% for lot in lots %}
+    <tr>
+      <td><span class="cell-title">{{ lot.medicament }}</span><span class="cell-sub">Seuil d’alerte : {{ lot.medicament.seuil_alerte }}</span></td>
+      <td>{{ lot.numero_lot }}</td>
+      <td>{{ lot.date_peremption|date:"d/m/Y" }}<span class="cell-sub">{% with j=lot.date_peremption|jours_restants %}{% if j < 0 %}expiré depuis {{ j|absolu }} j{% elif j == 0 %}expire aujourd’hui{% else %}dans {{ j }} j{% endif %}{% endwith %}</span></td>
+      <td class="num">{{ lot.quantite_disponible }}</td>
+      <td>{% lot_badge lot %}</td>
+      <td><a class="text-link" href="{% url 'stock:detail' lot.pk %}">Détail</a></td>
+    </tr>
+  {% endfor %}</tbody>
+</table></div>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Encaisser {{ vente.numero }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'ventes:liste' %}">Ventes</a></li><li><a href="{% url 'ventes:detail' vente.pk %}">{{ vente.numero }}</a></li><li aria-current="page">Encaisser</li></ol></nav><h1>Encaisser la vente</h1></div></div>
+{% if vente.statut != 'en_cours' %}
+<div class="empty-state form-narrow"><i class="bi bi-check2-circle" aria-hidden="true"></i><h2>Vente déjà réglée</h2><p>Cette vente n’attend plus de paiement.</p><a class="btn btn-primary" href="{% url 'ventes:detail' vente.pk %}">Voir la vente</a></div>
+{% else %}
+<form method="post" class="panel form-narrow" novalidate>
+  {% csrf_token %}
+  <p class="stat-value mb-3">{{ vente.total|ar }}</p>
+  <fieldset class="payment-fieldset"><legend class="form-label">Mode de paiement</legend>
+    <div class="pay-grid">
+      <label class="pay-card"><input type="radio" name="mode" value="especes" checked><i class="bi bi-cash-coin" aria-hidden="true"></i><span>Espèces</span></label>
+      <label class="pay-card"><input type="radio" name="mode" value="mobile_money"><i class="bi bi-phone" aria-hidden="true"></i><span>Mobile money</span></label>
+      <label class="pay-card"><input type="radio" name="mode" value="carte"><i class="bi bi-credit-card" aria-hidden="true"></i><span>Carte</span></label>
+      <label class="pay-card"><input type="radio" name="mode" value="cheque"><i class="bi bi-journal-text" aria-hidden="true"></i><span>Chèque</span></label>
+    </div></fieldset>
+  <div class="form-actions"><a class="btn btn-outline-secondary" href="{% url 'ventes:detail' vente.pk %}">Annuler</a><button type="submit" class="btn btn-primary">Valider le paiement</button></div>
+  <p class="payment-hint">Les paiements électroniques sont simulés dans cette version.</p>
+</form>
+{% endif %}
+{% endblock %}

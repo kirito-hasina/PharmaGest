@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}{{ fournisseur }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'fournisseurs:liste' %}">Fournisseurs</a></li><li aria-current="page">{{ fournisseur }}</li></ol></nav>
+    <h1>{{ fournisseur }}</h1>
+    <p class="lede">{% if fournisseur.actif %}<span class="statut statut-actif"><i class="bi bi-check-circle" aria-hidden="true"></i>Actif</span>{% else %}<span class="statut statut-inactif"><i class="bi bi-pause-circle" aria-hidden="true"></i>Inactif</span>{% endif %}</p></div>
+  <div class="page-head-actions">
+    <a class="btn btn-outline-secondary" href="{% url 'fournisseurs:modifier' fournisseur.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i>Modifier</a>
+    <form method="post" action="{% url 'fournisseurs:desactiver' fournisseur.pk %}" data-confirm="{% if fournisseur.actif %}Désactiver ce fournisseur ? Il ne pourra plus recevoir de nouvelles commandes ; l’historique est conservé.{% else %}Réactiver ce fournisseur ?{% endif %}">{% csrf_token %}<button type="submit" class="btn {% if fournisseur.actif %}btn-outline-danger{% else %}btn-outline-secondary{% endif %}">{% if fournisseur.actif %}Désactiver{% else %}Réactiver{% endif %}</button></form>
+    {% if fournisseur.actif and acces.achats %}<a class="btn btn-primary" href="{% url 'achats:creer' %}"><i class="bi bi-truck" aria-hidden="true"></i>Nouvelle commande</a>{% endif %}
+  </div>
+</div>
+<div class="layout-2">
+  <section class="panel"><h2>Coordonnées</h2>
+    <dl class="dl-grid">
+      <dt>Téléphone</dt><dd>{{ fournisseur.telephone }}</dd>
+      <dt>E-mail</dt><dd>{{ fournisseur.email|default:"—" }}</dd>
+      <dt>Adresse</dt><dd>{{ fournisseur.adresse|default:"—"|linebreaksbr }}</dd>
+      <dt>Contact principal</dt><dd>{{ fournisseur.contact_principal|default:"—" }}</dd>
+      <dt>N° fiscal / pro.</dt><dd>{{ fournisseur.identifiant_fiscal|default:"—" }}</dd>
+    </dl></section>
+  <section class="panel"><h2>Montants</h2>
+    <dl class="dl-grid"><dt>Commandé</dt><dd class="num">{{ total_commandes|ar }}</dd><dt>Réceptionné</dt><dd class="num">{{ total_receptions|ar }}</dd></dl>
+    <p class="hint">Le montant réceptionné ne compte que les réceptions validées, au prix de commande.</p></section>
+</div>
+<section class="table-panel panel">
+  <div class="section-head"><h2>Historique des achats</h2></div>
+  {% if commandes %}
+  <div class="table-scroll" tabindex="0"><table class="table">
+    <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col" class="num">Montant</th><th scope="col">Statut</th></tr></thead>
+    <tbody>{% for c in commandes %}<tr><td>{% if acces.achats %}<a href="{% url 'achats:detail' c.pk %}">{{ c.numero }}</a>{% else %}{{ c.numero }}{% endif %}</td><td>{{ c.date_commande|date:"d/m/Y" }}</td><td class="num">{{ c.montant_total|ar }}</td><td><span class="statut statut-{{ c.statut }}">{{ c.get_statut_display }}</span></td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="empty-inline"><i class="bi bi-info-circle" aria-hidden="true"></i>Aucune commande pour ce fournisseur.</p>{% endif %}
+</section>
+{% endblock %}

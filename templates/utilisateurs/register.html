@@ -1,0 +1,89 @@
+{% extends "base_auth.html" %}
+{% block title %}Inscription{% endblock %}
+{% block auth_content %}
+<div class="auth-heading">
+  <span class="auth-kicker">Nouveau compte</span>
+  <h2>Créer votre compte</h2>
+  <p>Renseignez vos informations. L’activation sera effectuée par un administrateur.</p>
+</div>
+
+<form method="post" id="registerForm" novalidate>
+  {% csrf_token %}
+  {% if erreurs.general %}<div class="alert alert-danger" role="alert">{{ erreurs.general }}</div>{% endif %}
+  <div class="row g-3">
+    <div class="col-sm-6">
+      <div class="field">
+        <label class="form-label" for="firstName">Prénom <span>*</span></label>
+        <input class="form-control{% if erreurs.firstName %} is-invalid{% endif %}" id="firstName" name="firstName" type="text" value="{{ valeurs.first_name }}" autocomplete="given-name" required>
+        {% if erreurs.firstName %}<div class="invalid-feedback">{{ erreurs.firstName }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="field">
+        <label class="form-label" for="lastName">Nom <span>*</span></label>
+        <input class="form-control{% if erreurs.lastName %} is-invalid{% endif %}" id="lastName" name="lastName" type="text" value="{{ valeurs.last_name }}" autocomplete="family-name" required>
+        {% if erreurs.lastName %}<div class="invalid-feedback">{{ erreurs.lastName }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="form-label" for="regUsername">Identifiant <span>*</span></label>
+    <div class="input-icon">
+      <i class="bi bi-person" aria-hidden="true"></i>
+      <input class="form-control{% if erreurs.regUsername %} is-invalid{% endif %}" id="regUsername" name="regUsername" type="text" value="{{ valeurs.username }}" autocomplete="username" minlength="3" required>
+    </div>
+    {% if erreurs.regUsername %}<div class="field-error">{{ erreurs.regUsername }}</div>{% endif %}
+  </div>
+
+  <div class="field">
+    <label class="form-label" for="regEmail">Adresse e-mail <span>*</span></label>
+    <div class="input-icon">
+      <i class="bi bi-envelope" aria-hidden="true"></i>
+      <input class="form-control{% if erreurs.regEmail %} is-invalid{% endif %}" id="regEmail" name="regEmail" type="email" value="{{ valeurs.email }}" autocomplete="email" required>
+    </div>
+    {% if erreurs.regEmail %}<div class="field-error">{{ erreurs.regEmail }}</div>{% endif %}
+  </div>
+
+  <div class="field">
+    <label class="form-label" for="regPassword">Mot de passe <span>*</span></label>
+    <div class="input-icon password-wrap">
+      <i class="bi bi-lock" aria-hidden="true"></i>
+      <input class="form-control{% if erreurs.regPassword %} is-invalid{% endif %}" id="regPassword" name="regPassword" type="password" autocomplete="new-password" required>
+      <button type="button" class="password-toggle" data-toggle-password="regPassword" aria-label="Afficher le mot de passe" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+    </div>
+    {% if erreurs.regPassword %}<div class="field-error">{{ erreurs.regPassword }}</div>{% endif %}
+    <div class="password-strength">
+      <div class="strength-track"><span id="strengthMeter"></span></div>
+      <span>Force : <strong id="strengthLabel">Faible</strong></span>
+    </div>
+    <ul class="password-rules" aria-label="Règles du mot de passe">
+      <li data-rule="length">8 caractères minimum</li>
+      <li data-rule="upper">Une majuscule</li>
+      <li data-rule="number">Un chiffre</li>
+      <li data-rule="special">Un caractère spécial</li>
+    </ul>
+  </div>
+
+  <div class="field">
+    <label class="form-label" for="confirmPassword">Confirmation <span>*</span></label>
+    <div class="input-icon password-wrap">
+      <i class="bi bi-lock" aria-hidden="true"></i>
+      <input class="form-control{% if erreurs.confirmPassword %} is-invalid{% endif %}" id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" required>
+      <button type="button" class="password-toggle" data-toggle-password="confirmPassword" aria-label="Afficher la confirmation" aria-pressed="false"><i class="bi bi-eye" aria-hidden="true"></i></button>
+    </div>
+    {% if erreurs.confirmPassword %}<div class="field-error">{{ erreurs.confirmPassword }}</div>{% endif %}
+  </div>
+
+  <div class="form-check auth-consent">
+    <input class="form-check-input" type="checkbox" id="privacyConsent" name="privacyConsent" required{% if request.method == 'POST' and request.POST.privacyConsent %} checked{% endif %}>
+    <label class="form-check-label" for="privacyConsent">J’accepte que mes informations soient utilisées pour gérer mon accès à PharmaGest.</label>
+  </div>
+  {% if erreurs.privacyConsent %}<div class="field-error">{{ erreurs.privacyConsent }}</div>{% endif %}
+
+  <input type="hidden" id="nomComplet" name="nomComplet">
+  <button type="submit" id="registerSubmit" class="btn btn-primary btn-lg auth-submit"><span>Créer mon compte</span><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+</form>
+
+<p class="auth-switch">Vous avez déjà un compte ? <a href="{% url 'utilisateurs:connexion' %}">Se connecter</a></p>
+{% endblock %}

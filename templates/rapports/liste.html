@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Rapports{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Rapports</h1><p class="lede">Consultez à l’écran ou téléchargez en PDF.</p></div></div>
+<div class="report-grid">
+  <article class="report-card"><span class="report-icon"><i class="bi bi-box-seam" aria-hidden="true"></i></span><span class="report-title">Rapport de stock</span><span class="report-description">Tous les lots, quantités disponibles et dates de péremption.</span>
+    <span class="report-action"><a href="{% url 'rapports:stock' %}">Consulter</a> · <a href="{% url 'rapports:pdf' 'stock' %}">PDF</a></span></article>
+  <article class="report-card"><span class="report-icon"><i class="bi bi-receipt" aria-hidden="true"></i></span><span class="report-title">Rapport des ventes</span><span class="report-description">Ventes enregistrées avec leur total et leur statut.</span>
+    <span class="report-action"><a href="{% url 'rapports:ventes' %}">Consulter</a> · <a href="{% url 'rapports:pdf' 'ventes' %}">PDF</a></span></article>
+  <article class="report-card"><span class="report-icon"><i class="bi bi-truck" aria-hidden="true"></i></span><span class="report-title">Rapport des achats</span><span class="report-description">Commandes d’achat par fournisseur, montants et avancement.</span>
+    <span class="report-action"><a href="{% url 'rapports:achats' %}">Consulter</a> · <a href="{% url 'rapports:pdf' 'achats' %}">PDF</a></span></article>
+  <article class="report-card"><span class="report-icon warning"><i class="bi bi-clock-history" aria-hidden="true"></i></span><span class="report-title">Produits proches de la péremption</span><span class="report-description">Lots périmés ou qui expirent dans les 90 jours.</span>
+    <span class="report-action"><a href="{% url 'rapports:peremption' %}">Consulter</a> · <a href="{% url 'rapports:pdf' 'peremption' %}">PDF</a></span></article>
+</div>
+{% endblock %}

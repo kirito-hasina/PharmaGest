@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Nouveau fournisseur{% endblock %}
+{% block content %}
+<div class="page-head"><div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'fournisseurs:liste' %}">Fournisseurs</a></li><li aria-current="page">Nouveau</li></ol></nav><h1>Nouveau fournisseur</h1></div></div>
+<form method="post" class="panel form-narrow" novalidate>
+  {% csrf_token %}
+  {% include "partials/_form.html" %}
+  <div class="form-actions"><a class="btn btn-outline-secondary" href="{% url 'fournisseurs:liste' %}">Annuler</a><button type="submit" class="btn btn-primary">Enregistrer</button></div>
+</form>
+{% endblock %}

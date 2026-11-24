@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Réception{% endblock %}
+{% block content %}
+{% if commande %}
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'achats:liste' %}">Commandes d’achat</a></li><li><a href="{% url 'achats:detail' commande.pk %}">{{ commande.numero }}</a></li><li aria-current="page">Réception</li></ol></nav>
+    <h1>Réceptionner {{ commande.numero }}</h1><p class="lede">Saisissez ce qui est réellement arrivé. Le stock augmente à la validation, une seule fois.</p></div>
+</div>
+<form method="post" id="receptionForm" data-confirm="Valider cette réception ? Le stock sera augmenté des quantités saisies.">
+  {% csrf_token %}
+  <section class="panel">
+    <div class="table-scroll" tabindex="0"><table class="table lines-table">
+      <thead><tr><th scope="col">Médicament</th><th scope="col" class="num">Reste</th><th scope="col">Quantité reçue</th><th scope="col">N° de lot</th><th scope="col">Péremption</th></tr></thead>
+      <tbody>{% for l in commande.lignes.all %}
+        {% with reste=l|reste_a_recevoir %}
+        <tr>
+          <td><span class="cell-title">{{ l.medicament }}</span><span class="cell-sub">Commandé : {{ l.quantite_commandee }}</span></td>
+          <td class="num">{{ reste }}</td>
+          {% if reste > 0 %}
+          {% posted 'q' l.pk as qv %}{% posted 'lot' l.pk as lotv %}{% posted 'exp' l.pk as expv %}
+          <td style="width:140px"><label class="visually-hidden" for="q_{{ l.pk }}">Quantité reçue de {{ l.medicament }}</label><input class="form-control" type="number" id="q_{{ l.pk }}" name="q_{{ l.pk }}" min="0" max="{{ reste }}" step="1" value="{{ qv|default:0 }}" data-qte-reception></td>
+          <td style="width:200px"><label class="visually-hidden" for="lot_{{ l.pk }}">Numéro de lot de {{ l.medicament }}</label><input class="form-control" id="lot_{{ l.pk }}" name="lot_{{ l.pk }}" maxlength="50" value="{{ lotv }}"></td>
+          <td style="width:200px"><label class="visually-hidden" for="exp_{{ l.pk }}">Date de péremption de {{ l.medicament }}</label><input class="form-control" type="date" id="exp_{{ l.pk }}" name="exp_{{ l.pk }}" value="{{ expv }}" data-date-future></td>
+          {% else %}
+          <td colspan="3"><span class="statut statut-recue"><i class="bi bi-check-circle" aria-hidden="true"></i>Ligne complète</span></td>
+          {% endif %}
+        </tr>
+        {% endwith %}
+      {% endfor %}</tbody>
+    </table></div>
+    <p class="hint">Pour chaque ligne reçue, le numéro de lot et la date de péremption (dans le futur) sont obligatoires.</p>
+  </section>
+  <div class="form-actions mt-3"><a class="btn btn-outline-secondary" href="{% url 'achats:detail' commande.pk %}">Annuler</a><button type="submit" class="btn btn-primary"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>Valider la réception</button></div>
+</form>
+{% else %}
+<div class="page-head"><div><h1>Réceptions à faire</h1><p class="lede">Commandes validées ou partiellement reçues.</p></div></div>
+{% if commandes %}
+<div class="table-scroll" tabindex="0"><table class="table table-hover">
+  <thead><tr><th scope="col">N°</th><th scope="col">Fournisseur</th><th scope="col">Date</th><th scope="col">Statut</th><th scope="col"></th></tr></thead>
+  <tbody>{% for c in commandes %}
+    <tr><td><a href="{% url 'achats:detail' c.pk %}">{{ c.numero }}</a></td><td>{{ c.fournisseur }}</td><td>{{ c.date_commande|date:"d/m/Y" }}</td><td><span class="statut statut-{{ c.statut }}">{{ c.get_statut_display }}</span></td>
+      <td>{% if c.statut == 'envoyee' or c.statut == 'partielle' %}<a class="btn btn-primary" href="{% url 'achats:reception' c.pk %}">Réceptionner</a>{% else %}<span class="cell-sub">Valider d’abord la commande</span>{% endif %}</td></tr>
+  {% endfor %}</tbody>
+</table></div>
+{% else %}
+<div class="empty-state"><i class="bi bi-check2-circle" aria-hidden="true"></i><h2>Rien à réceptionner</h2><p>Toutes les commandes sont reçues ou annulées.</p></div>
+{% endif %}
+{% endif %}
+{% endblock %}

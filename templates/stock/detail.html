@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load pharma %}
+{% block title %}Lot {{ lot.numero_lot }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><nav class="crumbs" aria-label="Fil d’Ariane"><ol><li><a href="{% url 'stock:liste' %}">Stock et lots</a></li><li aria-current="page">Lot {{ lot.numero_lot }}</li></ol></nav>
+    <h1>{{ lot.medicament }}</h1><p class="lede">Lot {{ lot.numero_lot }} · {% lot_badge lot %}</p></div>
+</div>
+<div class="layout-2">
+  <section class="panel"><h2>Informations</h2>
+    <dl class="dl-grid">
+      <dt>Médicament</dt><dd>{% if acces.medicaments %}<a href="{% url 'medicaments:detail' lot.medicament.pk %}">{{ lot.medicament }}</a>{% else %}{{ lot.medicament }}{% endif %}</dd>
+      <dt>Péremption</dt><dd>{{ lot.date_peremption|date:"d/m/Y" }}</dd>
+      <dt>Quantité reçue</dt><dd>{{ lot.quantite_recue }}</dd>
+      <dt>Disponible</dt><dd><strong>{{ lot.quantite_disponible }}</strong></dd>
+      <dt>Bloqué</dt><dd>{% if lot.bloque %}Oui{% else %}Non{% endif %}</dd>
+    </dl></section>
+  <section class="panel"><h2>Corriger le stock</h2><p class="stat-hint mb-3">Un décompte physique crée un mouvement de correction tracé avec votre nom.</p><a class="btn btn-outline-secondary" href="{% url 'stock:inventaire' %}"><i class="bi bi-clipboard-check" aria-hidden="true"></i>Inventaire physique</a></section>
+</div>
+<section class="table-panel panel">
+  <div class="section-head"><h2>Historique des mouvements</h2></div>
+  {% with mouvements=lot.mouvements.all %}
+  {% if mouvements %}
+  <div class="table-scroll" tabindex="0"><table class="table">
+    <thead><tr><th scope="col">Date</th><th scope="col">Type</th><th scope="col" class="num">Quantité</th><th scope="col">Motif</th><th scope="col">Par</th></tr></thead>
+    <tbody>{% for m in mouvements %}<tr><td>{{ m.date|date:"d/m/Y H:i" }}</td><td>{{ m.get_type_display }}</td><td class="num">{% if m.type == 'entree' or m.type == 'retour' %}+{{ m.quantite }}{% elif m.type == 'sortie' %}−{{ m.quantite }}{% else %}{% if m.quantite > 0 %}+{% endif %}{{ m.quantite }}{% endif %}</td><td>{{ m.motif|default:"—" }}</td><td>{{ m.utilisateur }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}<p class="empty-inline"><i class="bi bi-info-circle" aria-hidden="true"></i>Aucun mouvement pour ce lot.</p>{% endif %}
+  {% endwith %}
+</section>
+{% endblock %}

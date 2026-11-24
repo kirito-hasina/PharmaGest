@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static pharma %}
+{% block title %}Médicaments{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Médicaments</h1><p class="lede">Catalogue, prix et niveaux de stock.</p></div>
+  <div class="page-head-actions"><a class="btn btn-primary" href="{% url 'medicaments:creer' %}"><i class="bi bi-plus-lg" aria-hidden="true"></i>Nouveau médicament</a></div>
+</div>
+<form method="get" class="toolbar" role="search">
+  <div class="field grow"><label class="form-label" for="q">Nom ou code-barres</label><input class="form-control" type="search" id="q" name="q" value="{{ request.GET.q }}" placeholder="Rechercher…"></div>
+  <div class="field"><label class="form-label" for="categorie">Catégorie</label>
+    <select class="form-select" id="categorie" name="categorie"><option value="">Toutes</option>{% for c in categories %}<option value="{{ c.pk }}" {% if request.GET.categorie == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.nom }}</option>{% endfor %}</select></div>
+  <div class="field"><label class="form-label" for="statut">Statut</label>
+    <select class="form-select" id="statut" name="statut"><option value="">Tous</option><option value="actif" {% if request.GET.statut == 'actif' %}selected{% endif %}>Actif</option><option value="inactif" {% if request.GET.statut == 'inactif' %}selected{% endif %}>Archivé</option><option value="retire" {% if request.GET.statut == 'retire' %}selected{% endif %}>Retiré</option></select></div>
+  <div class="field"><label class="form-label" for="tri">Trier par</label>
+    <select class="form-select" id="tri" name="tri">
+      <option value="nom_commercial" {% if request.GET.tri == 'nom_commercial' %}selected{% endif %}>Nom (A–Z)</option>
+      <option value="-nom_commercial" {% if request.GET.tri == '-nom_commercial' %}selected{% endif %}>Nom (Z–A)</option>
+      <option value="prix_vente" {% if request.GET.tri == 'prix_vente' %}selected{% endif %}>Prix croissant</option>
+      <option value="-prix_vente" {% if request.GET.tri == '-prix_vente' %}selected{% endif %}>Prix décroissant</option>
+      <option value="-date_creation" {% if request.GET.tri == '-date_creation' %}selected{% endif %}>Plus récents</option>
+    </select></div>
+  <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel" aria-hidden="true"></i>Filtrer</button>
+</form>
+<p class="result-count">{{ page_obj.paginator.count }} médicament{{ page_obj.paginator.count|pluralize }}</p>
+{% if medicaments %}
+<div class="table-scroll" tabindex="0">
+  <table class="table table-hover">
+    <caption class="visually-hidden">Liste des médicaments</caption>
+    <thead><tr><th scope="col">Médicament</th><th scope="col">Catégorie</th><th scope="col" class="num">Prix de vente</th><th scope="col" class="num">Stock</th><th scope="col">Statut</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+    <tbody>
+    {% for m in medicaments %}
+      <tr>
+        <td><div class="product-cell"><span class="med-thumb">{% if m.photo %}<img src="{{ m.photo.url }}" alt="">{% else %}<i class="bi bi-capsule" aria-hidden="true"></i>{% endif %}</span>
+          <span><a class="cell-title text-decoration-none" href="{% url 'medicaments:detail' m.pk %}">{{ m.nom_commercial }}</a><span class="cell-sub">{{ m.dosage }} · {{ m.forme }}{% if m.code_barres %} · {{ m.code_barres }}{% endif %}</span></span></div></td>
+        <td>{{ m.categorie }}</td>
+        <td class="num">{{ m.prix_vente|ar }}</td>
+        <td class="num">{{ m.stock_total }}
+          {% if m.statut == 'actif' %}{% if m.stock_total == 0 %}<span class="statut statut-rupture ms-1"><i class="bi bi-x-circle" aria-hidden="true"></i>Rupture</span>{% elif m.stock_total <= m.seuil_alerte %}<span class="statut statut-faible ms-1"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i>Faible</span>{% endif %}{% endif %}</td>
+        <td><span class="statut statut-{{ m.statut }}">{{ m.get_statut_display }}</span></td>
+        <td><div class="actions">
+          <a class="btn btn-outline-secondary" href="{% url 'medicaments:modifier' m.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Modifier {{ m.nom_commercial }}</span></a>
+          {% if m.statut == 'actif' %}<form method="post" action="{% url 'medicaments:archiver' m.pk %}" data-confirm="Archiver « {{ m }} » ? Il ne sera plus proposé à la vente ni aux commandes, mais son historique est conservé.">{% csrf_token %}<button type="submit" class="btn btn-outline-danger"><i class="bi bi-archive" aria-hidden="true"></i><span class="visually-hidden">Archiver {{ m.nom_commercial }}</span></button></form>{% endif %}
+        </div></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include "partials/_pagination.html" %}
+{% else %}
+<div class="empty-state"><i class="bi bi-capsule" aria-hidden="true"></i><h2>Aucun médicament</h2><p>Aucun résultat pour ces critères. Créez d’abord une catégorie, puis votre premier médicament.</p><a class="btn btn-primary" href="{% url 'medicaments:creer' %}">Nouveau médicament</a></div>
+{% endif %}
+{% endblock %}

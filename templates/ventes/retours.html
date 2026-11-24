@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Retours{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Retours</h1><p class="lede">Retours de produits vendus, avec leur motif et leur auteur.</p></div></div>
+{% if retours %}
+<div class="table-scroll" tabindex="0"><table class="table table-hover">
+  <caption class="visually-hidden">Retours</caption>
+  <thead><tr><th scope="col">Date</th><th scope="col">Vente</th><th scope="col">Médicament</th><th scope="col" class="num">Quantité</th><th scope="col">Motif</th><th scope="col">Remis en stock</th><th scope="col">Par</th></tr></thead>
+  <tbody>{% for r in retours %}
+    <tr><td>{{ r.date|date:"d/m/Y H:i" }}</td><td><a href="{% url 'ventes:detail' r.ligne_vente.vente.pk %}">{{ r.ligne_vente.vente.numero }}</a></td><td>{{ r.ligne_vente.lot.medicament }}<span class="cell-sub">Lot {{ r.ligne_vente.lot.numero_lot }}</span></td><td class="num">{{ r.quantite_retournee }}</td><td>{{ r.motif }}</td><td>{% if r.remise_en_stock %}<span class="statut statut-valide"><i class="bi bi-check-circle" aria-hidden="true"></i>Oui</span>{% else %}<span class="statut statut-brouillon"><i class="bi bi-hourglass-split" aria-hidden="true"></i>En attente de contrôle</span>{% endif %}</td><td>{{ r.utilisateur }}</td></tr>
+  {% endfor %}</tbody>
+</table></div>
+{% else %}
+<div class="empty-state"><i class="bi bi-arrow-return-left" aria-hidden="true"></i><h2>Aucun retour</h2><p>Les retours se déclarent depuis la fiche d’une vente payée.</p><a class="btn btn-primary" href="{% url 'ventes:liste' %}">Voir les ventes</a></div>
+{% endif %}
+{% endblock %}

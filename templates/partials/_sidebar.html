@@ -1,0 +1,53 @@
+{% load static %}
+{% with ns=request.resolver_match.namespace un=request.resolver_match.url_name %}
+<aside class="app-sidebar" id="appSidebar" aria-label="Navigation principale">
+  <a class="brand" href="{% url 'rapports:dashboard' %}">
+    <img src="{% static 'images/capsule.svg' %}" alt="">
+    <span class="brand-text"><span class="brand-name">PharmaGest</span><span class="brand-sub">Gestion de pharmacie</span></span>
+  </a>
+  <nav class="sidebar-scroll">
+    {% if acces.dashboard %}
+    <a class="side-link {% if ns == 'rapports' and un == 'dashboard' %}is-active{% endif %}" data-label="Tableau de bord" href="{% url 'rapports:dashboard' %}" {% if ns == 'rapports' and un == 'dashboard' %}aria-current="page"{% endif %}><i class="bi bi-speedometer2" aria-hidden="true"></i><span class="side-label">Tableau de bord</span></a>
+    {% endif %}
+
+    {% if acces.ventes or acces.clients %}<p class="nav-caption">Vente</p>{% endif %}
+    {% if acces.ventes %}
+    <a class="side-link {% if ns == 'ventes' and un == 'creer' %}is-active{% endif %}" data-label="Caisse" href="{% url 'ventes:creer' %}" {% if ns == 'ventes' and un == 'creer' %}aria-current="page"{% endif %}><i class="bi bi-cart3" aria-hidden="true"></i><span class="side-label">Caisse</span></a>
+    <a class="side-link {% if ns == 'ventes' and un in 'liste,detail,payer,retour' %}is-active{% endif %}" data-label="Ventes" href="{% url 'ventes:liste' %}"><i class="bi bi-receipt" aria-hidden="true"></i><span class="side-label">Historique des ventes</span></a>
+    <a class="side-link {% if ns == 'ventes' and un == 'retours' %}is-active{% endif %}" data-label="Retours" href="{% url 'ventes:retours' %}"><i class="bi bi-arrow-return-left" aria-hidden="true"></i><span class="side-label">Retours</span></a>
+    {% endif %}
+    {% if acces.clients %}
+    <a class="side-link {% if ns == 'clients' %}is-active{% endif %}" data-label="Clients" href="{% url 'clients:liste' %}"><i class="bi bi-people" aria-hidden="true"></i><span class="side-label">Clients</span></a>
+    {% endif %}
+
+    {% if acces.stock or acces.achats or acces.fournisseurs %}<p class="nav-caption">Stock et achats</p>{% endif %}
+    {% if acces.stock %}
+    <a class="side-link {% if ns == 'stock' and un in 'liste,lots,detail' %}is-active{% endif %}" data-label="Stock et lots" href="{% url 'stock:liste' %}"><i class="bi bi-box-seam" aria-hidden="true"></i><span class="side-label">Stock et lots</span></a>
+    <a class="side-link {% if ns == 'stock' and un == 'mouvements' %}is-active{% endif %}" data-label="Mouvements" href="{% url 'stock:mouvements' %}"><i class="bi bi-arrow-left-right" aria-hidden="true"></i><span class="side-label">Mouvements</span></a>
+    <a class="side-link {% if ns == 'stock' and un == 'inventaire' %}is-active{% endif %}" data-label="Inventaire" href="{% url 'stock:inventaire' %}"><i class="bi bi-clipboard-check" aria-hidden="true"></i><span class="side-label">Inventaire physique</span></a>
+    {% endif %}
+    {% if acces.achats %}
+    <a class="side-link {% if ns == 'achats' and un != 'reception_ecran' %}is-active{% endif %}" data-label="Commandes" href="{% url 'achats:liste' %}"><i class="bi bi-truck" aria-hidden="true"></i><span class="side-label">Commandes d’achat</span></a>
+    <a class="side-link {% if ns == 'achats' and un == 'reception_ecran' %}is-active{% endif %}" data-label="Réceptions" href="{% url 'achats:reception_ecran' %}"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i><span class="side-label">Réceptions</span></a>
+    {% endif %}
+    {% if acces.fournisseurs %}
+    <a class="side-link {% if ns == 'fournisseurs' %}is-active{% endif %}" data-label="Fournisseurs" href="{% url 'fournisseurs:liste' %}"><i class="bi bi-shop" aria-hidden="true"></i><span class="side-label">Fournisseurs</span></a>
+    {% endif %}
+
+    {% if acces.medicaments %}
+    <p class="nav-caption">Catalogue</p>
+    <a class="side-link {% if ns == 'medicaments' and un != 'categories' and un != 'modifier_categorie' %}is-active{% endif %}" data-label="Médicaments" href="{% url 'medicaments:liste' %}"><i class="bi bi-capsule" aria-hidden="true"></i><span class="side-label">Médicaments</span></a>
+    <a class="side-link {% if ns == 'medicaments' and un in 'categories,modifier_categorie' %}is-active{% endif %}" data-label="Catégories" href="{% url 'medicaments:categories' %}"><i class="bi bi-tags" aria-hidden="true"></i><span class="side-label">Catégories</span></a>
+    {% endif %}
+
+    {% if acces.rapports or acces.utilisateurs %}<p class="nav-caption">Pilotage</p>{% endif %}
+    {% if acces.rapports %}
+    <a class="side-link {% if ns == 'rapports' and un != 'dashboard' %}is-active{% endif %}" data-label="Rapports" href="{% url 'rapports:liste' %}"><i class="bi bi-file-earmark-bar-graph" aria-hidden="true"></i><span class="side-label">Rapports</span></a>
+    {% endif %}
+    {% if acces.utilisateurs %}
+    <a class="side-link {% if ns == 'utilisateurs' and un == 'liste' %}is-active{% endif %}" data-label="Utilisateurs" href="{% url 'utilisateurs:liste' %}"><i class="bi bi-person-gear" aria-hidden="true"></i><span class="side-label">Utilisateurs</span></a>
+    {% endif %}
+  </nav>
+  <button type="button" class="side-link side-collapse" id="sidebarCollapse" data-label="Réduire le menu" aria-pressed="false"><i class="bi bi-layout-sidebar-inset" aria-hidden="true"></i><span class="side-label">Réduire le menu</span></button>
+</aside>
+{% endwith %}

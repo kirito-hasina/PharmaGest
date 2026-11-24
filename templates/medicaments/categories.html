@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Catégories{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Catégories</h1><p class="lede">Classification commune des médicaments (antalgiques, vitamines, antiseptiques…).</p></div></div>
+<div class="layout-2">
+  <section>
+    <form method="get" class="toolbar" role="search">
+      <div class="field grow"><label class="form-label" for="q">Rechercher une catégorie</label><input class="form-control" type="search" id="q" name="q" value="{{ q }}"></div>
+      <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search" aria-hidden="true"></i>Rechercher</button>
+    </form>
+    {% if categories %}
+    <div class="table-scroll" tabindex="0"><table class="table table-hover">
+      <caption class="visually-hidden">Catégories</caption>
+      <thead><tr><th scope="col">Catégorie</th><th scope="col" class="num">Médicaments</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+      <tbody>{% for c in categories %}
+        <tr><td><span class="cell-title">{{ c.nom }}</span>{% if c.description %}<span class="cell-sub">{{ c.description }}</span>{% endif %}</td>
+          <td class="num">{{ c.medicaments.all|length }}</td>
+          <td><div class="actions">
+            <a class="btn btn-outline-secondary" href="{% url 'medicaments:modifier_categorie' c.pk %}"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Modifier {{ c.nom }}</span></a>
+            {% if c.medicaments.all %}<span class="cell-sub align-self-center">Utilisée</span>
+            {% else %}<form method="post" action="{% url 'medicaments:supprimer_categorie' c.pk %}" data-confirm="Supprimer la catégorie « {{ c.nom }} » ?">{% csrf_token %}<button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Supprimer {{ c.nom }}</span></button></form>{% endif %}
+          </div></td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="empty-state"><i class="bi bi-tags" aria-hidden="true"></i><h2>Aucune catégorie</h2><p>Ajoutez une première catégorie avec le formulaire.</p></div>{% endif %}
+  </section>
+  <section class="panel">
+    <h2>Nouvelle catégorie</h2>
+    <form method="post" action="{% url 'medicaments:categories' %}" novalidate>
+      {% csrf_token %}
+      <div class="field"><label class="form-label" for="nom">Nom <abbr title="obligatoire">*</abbr></label><input class="form-control" id="nom" name="nom" maxlength="100" required></div>
+      <div class="field"><label class="form-label" for="description">Description</label><textarea class="form-control" id="description" name="description" rows="3"></textarea></div>
+      <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg" aria-hidden="true"></i>Ajouter</button>
+    </form>
+    <p class="hint">Une catégorie utilisée par des médicaments ne peut pas être supprimée.</p>
+  </section>
+</div>
+{% endblock %}

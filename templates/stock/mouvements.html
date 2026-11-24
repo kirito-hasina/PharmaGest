@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Mouvements de stock{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Mouvements de stock</h1><p class="lede">Chaque entrée, sortie ou correction est tracée avec son auteur.</p></div></div>
+<form method="get" class="toolbar" role="search">
+  <div class="field grow"><label class="form-label" for="q">Médicament, lot ou utilisateur</label><input class="form-control" type="search" id="q" name="q" value="{{ request.GET.q }}"></div>
+  <div class="field"><label class="form-label" for="type">Type</label>
+    <select class="form-select" id="type" name="type"><option value="">Tous</option>{% for valeur, libelle in types %}<option value="{{ valeur }}" {% if request.GET.type == valeur %}selected{% endif %}>{{ libelle }}</option>{% endfor %}</select></div>
+  <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel" aria-hidden="true"></i>Filtrer</button>
+</form>
+{% if mouvements %}
+<p class="result-count">Les 200 mouvements les plus récents au maximum sont affichés.</p>
+<div class="table-scroll" tabindex="0"><table class="table table-hover">
+  <caption class="visually-hidden">Mouvements de stock</caption>
+  <thead><tr><th scope="col">Date</th><th scope="col">Type</th><th scope="col">Médicament</th><th scope="col">Lot</th><th scope="col" class="num">Quantité</th><th scope="col">Motif</th><th scope="col">Par</th></tr></thead>
+  <tbody>{% for m in mouvements %}
+    <tr><td>{{ m.date|date:"d/m/Y H:i" }}</td>
+      <td>{% if m.type == 'entree' %}<span class="statut statut-valide"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i>Entrée</span>{% elif m.type == 'sortie' %}<span class="statut statut-commandee"><i class="bi bi-box-arrow-up" aria-hidden="true"></i>Sortie</span>{% elif m.type == 'retour' %}<span class="statut statut-proche"><i class="bi bi-arrow-return-left" aria-hidden="true"></i>Retour</span>{% else %}<span class="statut statut-brouillon"><i class="bi bi-pencil-square" aria-hidden="true"></i>Correction</span>{% endif %}</td>
+      <td>{{ m.medicament }}</td><td><a href="{% url 'stock:detail' m.lot.pk %}">{{ m.lot.numero_lot }}</a></td>
+      <td class="num">{% if m.type == 'sortie' %}−{{ m.quantite }}{% elif m.type == 'ajustement' and m.quantite > 0 %}+{{ m.quantite }}{% elif m.type == 'entree' or m.type == 'retour' %}+{{ m.quantite }}{% else %}{{ m.quantite }}{% endif %}</td>
+      <td>{{ m.motif|default:"—" }}</td><td>{{ m.utilisateur }}</td></tr>
+  {% endfor %}</tbody>
+</table></div>
+{% else %}<div class="empty-state"><i class="bi bi-arrow-left-right" aria-hidden="true"></i><h2>Aucun mouvement</h2><p>Aucun mouvement ne correspond à ces critères.</p></div>{% endif %}
+{% endblock %}
